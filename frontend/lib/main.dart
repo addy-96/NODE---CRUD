@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_node/service.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -227,7 +227,7 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    AppServices.getUser();
+                    AppServices.getHome();
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
