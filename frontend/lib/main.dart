@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_node/service.dart';
 
-enum ActionType {get,delete}
+enum ActionType {create,read,update,delete}
 
 void main() {
   runApp(MyApp());
@@ -84,6 +83,9 @@ class MainBody extends StatefulWidget {
 class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin {
   late Animation<Offset> cardAnimation;
   late AnimationController animationController;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   @override
   void initState() {
@@ -104,7 +106,6 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.index != widget.index) {
-      // Update animation based on new index
       cardAnimation = widget.index == 0
           ? Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.easeOutBack))
           : Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.bounceInOut));
@@ -120,10 +121,11 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  Widget _buildTextField(String label, bool obscure, TextInputType textInputType) {
+  Widget _buildTextField(String label, bool obscure, TextInputType textInputType,TextEditingController textController) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: TextField(
+        controller: textController,
         maxLength: 20,
         obscureText: obscure,
         keyboardType: textInputType,
@@ -145,19 +147,39 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     switch (widget.index) {
       case 0:
-        return _creatOrUpdateuser('Create User');
+        return _creatOrUpdateuser('Create User',ActionType.create);
       case 1:
-        return _getOrDelete(ActionType.get,'Get User');
+        return _getOrDelete(ActionType.read,'Get User');
       case 2:
-        return _creatOrUpdateuser('Update User');
+        return _creatOrUpdateuser('Update User',ActionType.update);
       case 3:
         return _getOrDelete(ActionType.delete,'Delete User');
       default:
-        return _creatOrUpdateuser('none');
+        return _creatOrUpdateuser('none',ActionType.read);
     }
   }
 
-  Widget _creatOrUpdateuser(String sectionTitle) {
+
+
+    _onSubmit(ActionType action) {
+     switch(action){
+      case ActionType.create:
+      
+      return;
+      case ActionType.read:
+
+      return;
+      case ActionType.update:
+
+      return;
+      case ActionType.delete:
+
+      return;
+     }
+  }
+
+
+  Widget _creatOrUpdateuser(String sectionTitle, ActionType action) {
     final isWide = MediaQuery.of(context).size.width > 800;
     return Center(
       child: SlideTransition(
@@ -179,14 +201,14 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
               ),
               const SizedBox(height: 20),
-              _buildTextField("Name", false, TextInputType.text),
-              _buildTextField("Email", false, TextInputType.emailAddress),
-              _buildTextField("Phone Number", true, TextInputType.number),
+              _buildTextField("Name", false, TextInputType.text,_nameController),
+              _buildTextField("Email", false, TextInputType.emailAddress,_emailController),
+              _buildTextField("Phone Number", true, TextInputType.number,_phoneController),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _onSubmit(action),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,
@@ -224,14 +246,12 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
               ),
               const SizedBox(height: 20),
-              _buildTextField("Name", false, TextInputType.text),
+              _buildTextField("Name", false, TextInputType.text,_nameController),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    AppServices.getHome();
-                  },
+                  onPressed: _onSubmit(action),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,
