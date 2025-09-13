@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_node/service.dart';
 
+enum ActionType {get,delete}
+
 void main() {
   runApp(MyApp());
 }
@@ -122,6 +124,7 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: TextField(
+        maxLength: 20,
         obscureText: obscure,
         keyboardType: textInputType,
         decoration: InputDecoration(
@@ -142,19 +145,19 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     switch (widget.index) {
       case 0:
-        return _creatuser();
+        return _creatOrUpdateuser('Create User');
       case 1:
-        return _getuser();
+        return _getOrDelete(ActionType.get,'Get User');
       case 2:
-        return _getuser();
+        return _creatOrUpdateuser('Update User');
       case 3:
-        return _creatuser();
+        return _getOrDelete(ActionType.delete,'Delete User');
       default:
-        return _creatuser();
+        return _creatOrUpdateuser('none');
     }
   }
 
-  Widget _creatuser() {
+  Widget _creatOrUpdateuser(String sectionTitle) {
     final isWide = MediaQuery.of(context).size.width > 800;
     return Center(
       child: SlideTransition(
@@ -171,8 +174,8 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                "Create Account",
+               Text(
+                sectionTitle,
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
               ),
               const SizedBox(height: 20),
@@ -189,7 +192,7 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text("Create User", style: TextStyle(fontSize: 16, color: Colors.black)),
+                  child: Text(sectionTitle, style: TextStyle(fontSize: 16, color: Colors.black)),
                 ),
               ),
             ],
@@ -199,7 +202,7 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _getuser() {
+  Widget _getOrDelete(ActionType action, String sectionTitle) {
     final isWide = MediaQuery.of(context).size.width > 800;
     return Center(
       child: SlideTransition(
@@ -216,8 +219,8 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                "Get Account",
+               Text(
+                sectionTitle,
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
               ),
               const SizedBox(height: 20),
@@ -234,7 +237,7 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text("Get User", style: TextStyle(fontSize: 16, color: Colors.black)),
+                  child:  Text(sectionTitle, style: TextStyle(fontSize: 16, color: Colors.black)),
                 ),
               ),
             ],
