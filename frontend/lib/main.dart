@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_node/service.dart';
 
-enum ActionType {create,read,update,delete}
+enum ActionType { create, read, update, delete }
 
 void main() {
   runApp(MyApp());
@@ -11,7 +12,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(debugShowCheckedModeBanner: false, home: Wrapper());
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Wrapper(),
+    );
   }
 }
 
@@ -80,7 +84,8 @@ class MainBody extends StatefulWidget {
   State<MainBody> createState() => _MainBodyState();
 }
 
-class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin {
+class _MainBodyState extends State<MainBody>
+    with SingleTickerProviderStateMixin {
   late Animation<Offset> cardAnimation;
   late AnimationController animationController;
   final TextEditingController _emailController = TextEditingController();
@@ -89,11 +94,26 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
 
   @override
   void initState() {
-    animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
 
-    final initialUpAni = Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.easeOutBack));
+    final initialUpAni =
+        Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: animationController,
+            curve: Curves.easeOutBack,
+          ),
+        );
 
-    final sideAni = Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.bounceInOut));
+    final sideAni = Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: animationController,
+            curve: Curves.bounceInOut,
+          ),
+        );
 
     cardAnimation = widget.index == 0 ? initialUpAni : sideAni;
 
@@ -107,8 +127,18 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
 
     if (oldWidget.index != widget.index) {
       cardAnimation = widget.index == 0
-          ? Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.easeOutBack))
-          : Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.bounceInOut));
+          ? Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(
+              CurvedAnimation(
+                parent: animationController,
+                curve: Curves.easeOutBack,
+              ),
+            )
+          : Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero).animate(
+              CurvedAnimation(
+                parent: animationController,
+                curve: Curves.bounceInOut,
+              ),
+            );
 
       animationController.reset();
       animationController.forward();
@@ -121,7 +151,12 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  Widget _buildTextField(String label, bool obscure, TextInputType textInputType,TextEditingController textController) {
+  Widget _buildTextField(
+    String label,
+    bool obscure,
+    TextInputType textInputType,
+    TextEditingController textController,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: TextField(
@@ -147,37 +182,50 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     switch (widget.index) {
       case 0:
-        return _creatOrUpdateuser('Create User',ActionType.create);
+        return _creatOrUpdateuser('Create User', ActionType.create);
       case 1:
-        return _getOrDelete(ActionType.read,'Get User');
+        return _getOrDelete(ActionType.read, 'Get User');
       case 2:
-        return _creatOrUpdateuser('Update User',ActionType.update);
+        return _creatOrUpdateuser('Update User', ActionType.update);
       case 3:
-        return _getOrDelete(ActionType.delete,'Delete User');
+        return _getOrDelete(ActionType.delete, 'Delete User');
       default:
-        return _creatOrUpdateuser('none',ActionType.read);
+        return _creatOrUpdateuser('none', ActionType.read);
     }
   }
 
-
-
-    _onSubmit(ActionType action) {
-     switch(action){
+   _onSubmit(ActionType action) {
+    switch (action) {
       case ActionType.create:
-      
-      return;
+        AppServices.createUser(
+          _nameController.text.trim(),
+          _emailController.text.trim(),
+          int.parse(_phoneController.text.trim()),
+        );
+        _emailController.clear();
+        _nameController.clear();
+        _phoneController.clear();
+        return;
       case ActionType.read:
-
-      return;
+        AppServices.readUser(_nameController.text.trim());
+        _nameController.clear();
+        return;
       case ActionType.update:
-
-      return;
+        AppServices.updateUser(
+          _nameController.text.trim(),
+          _emailController.text.trim(),
+          int.parse(_phoneController.text.trim()),
+        );
+        _emailController.clear();
+        _nameController.clear();
+        _phoneController.clear();
+        return;
       case ActionType.delete:
-
-      return;
-     }
+        AppServices.deleteUser(_nameController.text);
+        _nameController.clear();
+        return;
+    }
   }
-
 
   Widget _creatOrUpdateuser(String sectionTitle, ActionType action) {
     final isWide = MediaQuery.of(context).size.width > 800;
@@ -191,19 +239,44 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: const [BoxShadow(blurRadius: 20, color: Colors.black12, offset: Offset(0, 10))],
+            boxShadow: const [
+              BoxShadow(
+                blurRadius: 20,
+                color: Colors.black12,
+                offset: Offset(0, 10),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-               Text(
+              Text(
                 sectionTitle,
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
               ),
               const SizedBox(height: 20),
-              _buildTextField("Name", false, TextInputType.text,_nameController),
-              _buildTextField("Email", false, TextInputType.emailAddress,_emailController),
-              _buildTextField("Phone Number", true, TextInputType.number,_phoneController),
+              _buildTextField(
+                "Name",
+                false,
+                TextInputType.text,
+                _nameController,
+              ),
+              _buildTextField(
+                "Email",
+                false,
+                TextInputType.emailAddress,
+                _emailController,
+              ),
+              _buildTextField(
+                "Phone Number",
+                true,
+                TextInputType.number,
+                _phoneController,
+              ),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -212,9 +285,14 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                  child: Text(sectionTitle, style: TextStyle(fontSize: 16, color: Colors.black)),
+                  child: Text(
+                    sectionTitle,
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
                 ),
               ),
             ],
@@ -236,17 +314,32 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: const [BoxShadow(blurRadius: 20, color: Colors.black12, offset: Offset(0, 10))],
+            boxShadow: const [
+              BoxShadow(
+                blurRadius: 20,
+                color: Colors.black12,
+                offset: Offset(0, 10),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-               Text(
+              Text(
                 sectionTitle,
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
               ),
               const SizedBox(height: 20),
-              _buildTextField("Name", false, TextInputType.text,_nameController),
+              _buildTextField(
+                "Name",
+                false,
+                TextInputType.text,
+                _nameController,
+              ),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -255,9 +348,14 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                  child:  Text(sectionTitle, style: TextStyle(fontSize: 16, color: Colors.black)),
+                  child: Text(
+                    sectionTitle,
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
                 ),
               ),
             ],
