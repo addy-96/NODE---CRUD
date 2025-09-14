@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:convert';
 
 import 'package:flutter_node/user.dart';
 import 'package:http/http.dart' as http;
@@ -6,14 +6,16 @@ import 'package:http/http.dart' as http;
 class AppServices {
   static final hostUri = Uri.parse('http://localhost:8000');
 
-  static Future<bool> createUser(
-    String name,
-    String email,
-    int phone,
-  ) async {
+  static Future<bool> createUser(User user) async {
     try {
       final String endPoint = '/create-user';
-      log(hostUri.toString());
+
+      final data = jsonEncode({user});
+
+      final url = Uri.parse('$hostUri$endPoint');
+
+      final res = await http.put(url, body: data);
+
       return true;
     } catch (err, st) {
       throw Exception('error while creating user : $err at $st');
@@ -22,7 +24,7 @@ class AppServices {
 
   static Future<User> readUser(String name) async {
     try {
-      return User(email: 'adad', phone: 892357892375,name: 'aki');
+      return User(email: 'adad', phone: '892357892375', name: 'aki');
     } catch (err, st) {
       throw Exception('error while creating user : $err at $st');
     }
@@ -31,7 +33,7 @@ class AppServices {
   static Future<bool> updateUser(
     String? name,
     String? email,
-    int? phone,
+    String? phone,
   ) async {
     try {
       return true;

@@ -13,7 +13,7 @@ const server = http.createServer((req, res) => {
   if (req.url === '/' && req.method === 'PUT') {
     return res.end('You havent added any endpoint try adding one!');
   } else if(req.url === '/create-user' && req.method === 'PUT'){  
-  
+   console.log('creeate user requested');
   } else if(req.url === '/update-user' && req.method === 'PATCH'){
       
   } else if(req.url === '/read-user' && req.method === 'GET'){

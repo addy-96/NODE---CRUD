@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_node/service.dart';
+import 'package:flutter_node/user.dart';
 
 enum ActionType { create, read, update, delete }
 
@@ -194,35 +195,89 @@ class _MainBodyState extends State<MainBody>
     }
   }
 
-   _onSubmit(ActionType action) {
+  showSnack(String message, Color color) {
+    return ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('message'), backgroundColor: color));
+  }
+
+  bool validate(ActionType action) {
     switch (action) {
       case ActionType.create:
-        AppServices.createUser(
-          _nameController.text.trim(),
-          _emailController.text.trim(),
-          int.parse(_phoneController.text.trim()),
-        );
-        _emailController.clear();
-        _nameController.clear();
-        _phoneController.clear();
+        if (_emailController.text.trim().isEmpty ||
+            _nameController.text.trim().isEmpty ||
+            _phoneController.text.trim().isEmpty) {
+          showSnack(
+            'Please enter all the fields to create a user!',
+            Colors.red,
+          );
+          return false;
+        }
+        return true;
+
+      case ActionType.read:
+        if (_nameController.text.trim().isEmpty) {
+          showSnack('Please enter the name to search user!', Colors.red);
+          return false;
+        }
+        return true;
+
+      case ActionType.update:
+        if (_emailController.text.trim().isEmpty ||
+            _nameController.text.trim().isEmpty ||
+            _phoneController.text.trim().isEmpty) {
+          showSnack('Please enter atleast one field!', Colors.red);
+          return false;
+        }
+        return true;
+      case ActionType.delete:
+        return true;
+    }
+  }
+
+  void _onSubmit(ActionType action) {
+    switch (action) {
+      case ActionType.create:
+        if (validate(action)) {
+          AppServices.createUser(
+            User(
+              email: _emailController.text.trim(),
+              phone: _phoneController.text.trim(),
+              name: _nameController.text.trim(),
+            ),
+          );
+          _emailController.clear();
+          _nameController.clear();
+          _phoneController.clear();
+          return;
+        }
         return;
       case ActionType.read:
-        AppServices.readUser(_nameController.text.trim());
-        _nameController.clear();
+        if (validate(action)) {
+          AppServices.readUser(_nameController.text.trim());
+          _nameController.clear();
+          return;
+        }
         return;
       case ActionType.update:
-        AppServices.updateUser(
-          _nameController.text.trim(),
-          _emailController.text.trim(),
-          int.parse(_phoneController.text.trim()),
-        );
-        _emailController.clear();
-        _nameController.clear();
-        _phoneController.clear();
+        if (validate(action)) {
+          AppServices.updateUser(
+            _nameController.text.trim(),
+            _emailController.text.trim(),
+            _phoneController.text.trim(),
+          );
+          _emailController.clear();
+          _nameController.clear();
+          _phoneController.clear();
+          return;
+        }
         return;
       case ActionType.delete:
-        AppServices.deleteUser(_nameController.text);
-        _nameController.clear();
+        if (validate(action)) {
+          AppServices.deleteUser(_nameController.text);
+          _nameController.clear();
+          return;
+        }
         return;
     }
   }
@@ -281,7 +336,9 @@ class _MainBodyState extends State<MainBody>
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _onSubmit(action),
+                  onPressed: () {
+                    _onSubmit(action);
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,
