@@ -3,13 +3,6 @@ const fs = require('fs');
 const log = require('./logger');
 
 
-class User {
-  constructor(name,id){
-        this.name =name,
-        this.id =id;
-  }
-}
-
 const server = http.createServer((req, res) => {
 
   if (req.url === '/' && req.method === 'PUT') {
@@ -27,11 +20,9 @@ const server = http.createServer((req, res) => {
     req.on('end',()=>{
       const fullBodyAsString = Buffer.concat(body).toString();
       
-       const obj = JSON.parse(fullBodyAsString);
 
-      console.log(obj.);
       
-    })
+    });
 
   } else if(req.url === '/update-user' && req.method === 'PATCH'){
       
