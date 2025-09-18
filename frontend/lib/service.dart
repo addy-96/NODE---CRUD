@@ -8,11 +8,11 @@ class AppServices {
     try {
       final url = Uri.parse('$uri/');
       final res = await http.get(url);
-      log('--------------------------');
-      log('Status: ${res.statusCode}');
-      log('Body: ${res.body}');
+      print('--------------------------');
+      print('Status: ${res.statusCode}');
+      print('Body: ${res.body}');
       return res;
-    } catch (err, stack) {
+    } catch ( err, stack) {
       log('Error: $err');
       log('Stack: $stack');
       rethrow;

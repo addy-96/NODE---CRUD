@@ -183,7 +183,9 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    AppServices.getHome();
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,

@@ -13,13 +13,18 @@ function getHomeContent(){}
 function createUser(user){}
 
 const server = http.createServer((req, res) => {
+  
+
   if (req.url === '/' && req.method === 'GET') {
-    console.log(req);
+    console.log(req.headers);
+    res.end('Welcome home!')
+
   } else if(req.url === '/create-user' && req.method === 'PUT'){  
     createUser()
   }
 });
 
-server.listen(3000, () => {
+server.listen(3000, '0.0.0.0' ,() => {
   console.log('Server running on http://localhost:3000');
 });
+
