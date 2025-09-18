@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_node/service.dart';
+import 'package:flutter_node/user.dart';
+
+enum ActionType { create, read, update, delete }
 
 void main() {
   runApp(MyApp());
@@ -82,6 +85,9 @@ class MainBody extends StatefulWidget {
 class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin {
   late Animation<Offset> cardAnimation;
   late AnimationController animationController;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   @override
   void initState() {
@@ -102,7 +108,6 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.index != widget.index) {
-      // Update animation based on new index
       cardAnimation = widget.index == 0
           ? Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.easeOutBack))
           : Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.bounceInOut));
@@ -118,10 +123,12 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  Widget _buildTextField(String label, bool obscure, TextInputType textInputType) {
+  Widget _buildTextField(String label, bool obscure, TextInputType textInputType, TextEditingController textController) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: TextField(
+        controller: textController,
+        maxLength: 20,
         obscureText: obscure,
         keyboardType: textInputType,
         decoration: InputDecoration(
@@ -142,19 +149,87 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     switch (widget.index) {
       case 0:
-        return _creatuser();
+        return _creatOrUpdateuser('Create User', ActionType.create);
       case 1:
-        return _getuser();
+        return _getOrDelete(ActionType.read, 'Get User');
       case 2:
-        return _getuser();
+        return _creatOrUpdateuser('Update User', ActionType.update);
       case 3:
-        return _creatuser();
+        return _getOrDelete(ActionType.delete, 'Delete User');
       default:
-        return _creatuser();
+        return _creatOrUpdateuser('none', ActionType.read);
     }
   }
 
-  Widget _creatuser() {
+  showSnack(String message, Color color) {
+    return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
+  }
+
+  bool validate(ActionType action) {
+    switch (action) {
+      case ActionType.create:
+        if (_emailController.text.trim().isEmpty || _nameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty) {
+          showSnack('Please enter all the fields to create a user!', Colors.red);
+          return false;
+        }
+        return true;
+
+      case ActionType.read:
+        if (_nameController.text.trim().isEmpty) {
+          showSnack('Please enter the name to search user!', Colors.red);
+          return false;
+        }
+        return true;
+
+      case ActionType.update:
+        if (_emailController.text.trim().isEmpty || _nameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty) {
+          showSnack('Please enter atleast one field!', Colors.red);
+          return false;
+        }
+        return true;
+      case ActionType.delete:
+        return true;
+    }
+  }
+
+  void _onSubmit(ActionType action) {
+    switch (action) {
+      case ActionType.create:
+        if (validate(action)) {
+          AppServices.createUser(User(email: _emailController.text.trim(), phone: _phoneController.text.trim(), name: _nameController.text.trim()));
+          _emailController.clear();
+          _nameController.clear();
+          _phoneController.clear();
+          return;
+        }
+        return;
+      case ActionType.read:
+        if (validate(action)) {
+          AppServices.readUser(_nameController.text.trim());
+          _nameController.clear();
+          return;
+        }
+        return;
+      case ActionType.update:
+        if (validate(action)) {
+          AppServices.updateUser(_nameController.text.trim(), _emailController.text.trim(), _phoneController.text.trim());
+          _emailController.clear();
+          _nameController.clear();
+          _phoneController.clear();
+          return;
+        }
+        return;
+      case ActionType.delete:
+        if (validate(action)) {
+          AppServices.deleteUser(_nameController.text);
+          _nameController.clear();
+          return;
+        }
+        return;
+    }
+  }
+
+  Widget _creatOrUpdateuser(String sectionTitle, ActionType action) {
     final isWide = MediaQuery.of(context).size.width > 800;
     return Center(
       child: SlideTransition(
@@ -171,27 +246,27 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                "Create Account",
+              Text(
+                sectionTitle,
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
               ),
               const SizedBox(height: 20),
-              _buildTextField("Name", false, TextInputType.text),
-              _buildTextField("Email", false, TextInputType.emailAddress),
-              _buildTextField("Phone Number", true, TextInputType.number),
+              _buildTextField("Name", false, TextInputType.text, _nameController),
+              _buildTextField("Email", false, TextInputType.emailAddress, _emailController),
+              _buildTextField("Phone Number", true, TextInputType.number, _phoneController),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    AppServices.getHome();
+                    _onSubmit(action);
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text("Create User", style: TextStyle(fontSize: 16, color: Colors.black)),
+                  child: Text(sectionTitle, style: TextStyle(fontSize: 16, color: Colors.black)),
                 ),
               ),
             ],
@@ -201,7 +276,7 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _getuser() {
+  Widget _getOrDelete(ActionType action, String sectionTitle) {
     final isWide = MediaQuery.of(context).size.width > 800;
     return Center(
       child: SlideTransition(
@@ -218,25 +293,25 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                "Get Account",
+              Text(
+                sectionTitle,
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
               ),
               const SizedBox(height: 20),
-              _buildTextField("Name", false, TextInputType.text),
+              _buildTextField("Name", false, TextInputType.text, _nameController),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    AppServices.getHome();
+                    _onSubmit(action);
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text("Get User", style: TextStyle(fontSize: 16, color: Colors.black)),
+                  child: Text(sectionTitle, style: TextStyle(fontSize: 16, color: Colors.black)),
                 ),
               ),
             ],
