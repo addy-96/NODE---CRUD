@@ -51,6 +51,15 @@ class _WrapperState extends State<Wrapper> {
       backgroundColor: Colors.black87,
       body: Column(
         children: [
+          SizedBox(height: 100),
+          IconButton(
+            icon: Icon(Icons.send),
+            color: Colors.white,
+            iconSize: 40,
+            onPressed: () {
+              AppServices.createUser(User(email: 'email@gmail.com', phone: '91818882222', name: 'name'));
+            },
+          ),
           Expanded(child: MainBody(index: index)),
           Center(
             child: Row(
@@ -123,13 +132,12 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  Widget _buildTextField(String label, bool obscure, TextInputType textInputType, TextEditingController textController) {
+  Widget _buildTextField(String label, TextInputType textInputType, TextEditingController textController, int maxLength) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: TextField(
         controller: textController,
-        maxLength: 20,
-        obscureText: obscure,
+        maxLength: maxLength,
         keyboardType: textInputType,
         decoration: InputDecoration(
           labelText: label,
@@ -192,11 +200,11 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     }
   }
 
-  void _onSubmit(ActionType action) {
+  void _onSubmit(ActionType action) async {
     switch (action) {
       case ActionType.create:
         if (validate(action)) {
-          AppServices.createUser(User(email: _emailController.text.trim(), phone: _phoneController.text.trim(), name: _nameController.text.trim()));
+          final res = await AppServices.createUser(User(email: _emailController.text.trim(), phone: _phoneController.text.trim(), name: _nameController.text.trim()));
           _emailController.clear();
           _nameController.clear();
           _phoneController.clear();
@@ -251,9 +259,9 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
               ),
               const SizedBox(height: 20),
-              _buildTextField("Name", false, TextInputType.text, _nameController),
-              _buildTextField("Email", false, TextInputType.emailAddress, _emailController),
-              _buildTextField("Phone Number", true, TextInputType.number, _phoneController),
+              _buildTextField("Name", TextInputType.text, _nameController, 20),
+              _buildTextField("Email", TextInputType.emailAddress, _emailController, 20),
+              _buildTextField("Phone Number", TextInputType.number, _phoneController, 10),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -298,7 +306,7 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
               ),
               const SizedBox(height: 20),
-              _buildTextField("Name", false, TextInputType.text, _nameController),
+              _buildTextField("Phone", TextInputType.number, _nameController, 10),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter_node/user.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +17,14 @@ class AppServices {
 
       final res = await http.put(url, body: data);
 
-      return true;
+      switch (res.statusCode) {
+        case 200:
+          return true;
+        case 404:
+          throw Exception('User already Exist!');
+        default:
+          return true;
+      }
     } catch (err, st) {
       throw Exception('error while creating user : $err at $st');
     }
@@ -30,11 +38,7 @@ class AppServices {
     }
   }
 
-  static Future<bool> updateUser(
-    String? name,
-    String? email,
-    String? phone,
-  ) async {
+  static Future<bool> updateUser(String? name, String? email, String? phone) async {
     try {
       return true;
     } catch (err, st) {
