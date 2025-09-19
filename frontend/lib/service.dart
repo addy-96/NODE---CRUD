@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter_node/core/custom_exception.dart';
 import 'package:flutter_node/user.dart';
 import 'package:http/http.dart' as http;
 
@@ -21,12 +22,13 @@ class AppServices {
         case 200:
           return true;
         case 404:
-          throw Exception('User already Exist!');
+          throw UserAlreadyExistException(message: 'User already Exist!');
         default:
           return true;
       }
     } catch (err, st) {
-      throw Exception('error while creating user : $err at $st');
+      print('error while creating user : $err at $st');
+      rethrow;
     }
   }
 

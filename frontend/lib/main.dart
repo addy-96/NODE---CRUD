@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_node/core/custom_exception.dart';
+import 'package:flutter_node/core/utils.dart';
 import 'package:flutter_node/service.dart';
 import 'package:flutter_node/user.dart';
 
@@ -56,8 +58,14 @@ class _WrapperState extends State<Wrapper> {
             icon: Icon(Icons.send),
             color: Colors.white,
             iconSize: 40,
-            onPressed: () {
-              AppServices.createUser(User(email: 'email@gmail.com', phone: '91818882222', name: 'name'));
+            onPressed: () async {
+              try {
+                await AppServices.createUser(User(email: 'email@gmail.com', phone: '91818882222', name: 'name'));
+              } on UserAlreadyExistException catch (err) {
+                showSnack(err.message, Colors.red, context);
+              } catch (err) {
+                showSnack(err.toString(), Colors.red, context);
+              }
             },
           ),
           Expanded(child: MainBody(index: index)),
@@ -169,29 +177,25 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     }
   }
 
-  showSnack(String message, Color color) {
-    return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
-  }
-
   bool validate(ActionType action) {
     switch (action) {
       case ActionType.create:
         if (_emailController.text.trim().isEmpty || _nameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty) {
-          showSnack('Please enter all the fields to create a user!', Colors.red);
+          showSnack('Please enter all the fields to create a user!', Colors.red, context);
           return false;
         }
         return true;
 
       case ActionType.read:
         if (_nameController.text.trim().isEmpty) {
-          showSnack('Please enter the name to search user!', Colors.red);
+          showSnack('Please enter the name to search user!', Colors.red, context);
           return false;
         }
         return true;
 
       case ActionType.update:
         if (_emailController.text.trim().isEmpty || _nameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty) {
-          showSnack('Please enter atleast one field!', Colors.red);
+          showSnack('Please enter atleast one field!', Colors.red, context);
           return false;
         }
         return true;
@@ -204,11 +208,7 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
     switch (action) {
       case ActionType.create:
         if (validate(action)) {
-          final res = await AppServices.createUser(User(email: _emailController.text.trim(), phone: _phoneController.text.trim(), name: _nameController.text.trim()));
-          _emailController.clear();
-          _nameController.clear();
-          _phoneController.clear();
-          return;
+          _onCreateUserService();
         }
         return;
       case ActionType.read:
@@ -234,6 +234,19 @@ class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin
           return;
         }
         return;
+    }
+  }
+
+  Future<void> _onCreateUserService() async {
+    try {
+      final res = await AppServices.createUser(User(email: _emailController.text.trim(), phone: _phoneController.text.trim(), name: _nameController.text.trim()));
+      _emailController.clear();
+      _nameController.clear();
+      _phoneController.clear();
+      return;
+    } on UserAlreadyExistException catch (err) {
+      showSnack(err.message, Colors.red, context);
+      return;
     }
   }
 
