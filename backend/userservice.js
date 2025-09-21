@@ -1,4 +1,4 @@
-export default function createUser(req) {
+ function createUser(req) {
     const body = [];
 
     req.on('data', (chunck)=>{
@@ -32,3 +32,5 @@ export default function createUser(req) {
     });
 
 }
+
+module.exports = createUser;
