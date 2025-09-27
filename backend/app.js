@@ -1,10 +1,6 @@
-// //core modules
-// const http = require('http');
 
-//external module
 const express = require('express');
 
-//my modules
 const handlRequest = require('./eventhandler')
 
 const app = express();
