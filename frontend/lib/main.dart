@@ -198,10 +198,10 @@ class _MainBodyState extends State<MainBody>
   showSnack(String message, Color color) {
     return ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text('message'), backgroundColor: color));
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
   }
 
-  bool validate(ActionType action) {
+  bool _validate(ActionType action) {
     switch (action) {
       case ActionType.create:
         if (_emailController.text.trim().isEmpty ||
@@ -235,47 +235,52 @@ class _MainBodyState extends State<MainBody>
     }
   }
 
-  void _onSubmit(ActionType action) {
+  void _onSubmit(ActionType action) async {
     switch (action) {
       case ActionType.create:
-        if (validate(action)) {
-          AppServices.createUser(
+        if (_validate(action)) {
+          final res = AppServices.createUser(
             User(
               email: _emailController.text.trim(),
               phone: _phoneController.text.trim(),
               name: _nameController.text.trim(),
             ),
           );
-          _emailController.clear();
-          _nameController.clear();
-          _phoneController.clear();
+          if (await res) {
+            _emailController.clear();
+            _nameController.clear();
+            _phoneController.clear();
+          }
           return;
         }
         return;
       case ActionType.read:
-        if (validate(action)) {
+        if (_validate(action)) {
           AppServices.readUser(_nameController.text.trim());
           _nameController.clear();
           return;
         }
         return;
       case ActionType.update:
-        if (validate(action)) {
-          AppServices.updateUser(
+        if (_validate(action)) {
+          final res = await AppServices.updateUser(
             _nameController.text.trim(),
             _emailController.text.trim(),
             _phoneController.text.trim(),
           );
-          _emailController.clear();
-          _nameController.clear();
-          _phoneController.clear();
+          if (res) {
+            _emailController.clear();
+            _nameController.clear();
+            _phoneController.clear();
+          }
           return;
         }
         return;
       case ActionType.delete:
-        if (validate(action)) {
-          AppServices.deleteUser(_nameController.text);
-          _nameController.clear();
+        if (_validate(action)) {
+          final res = await AppServices.deleteUser(_nameController.text);
+
+          res ? _nameController.clear() : null;
           return;
         }
         return;
@@ -401,7 +406,9 @@ class _MainBodyState extends State<MainBody>
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _onSubmit(action),
+                  onPressed: () {
+                    _onSubmit(action);
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,

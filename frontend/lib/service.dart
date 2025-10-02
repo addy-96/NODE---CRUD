@@ -4,13 +4,13 @@ import 'package:flutter_node/user.dart';
 import 'package:http/http.dart' as http;
 
 class AppServices {
-  static final hostUri = Uri.parse('http://localhost:8000');
+  static final hostUri = Uri.parse('http://10.48.189.64:3000');
 
   static Future<bool> createUser(User user) async {
     try {
       final String endPoint = '/create-user';
 
-      final data = jsonEncode({user});
+      final data = jsonEncode(user.toJson());
 
       final url = Uri.parse('$hostUri$endPoint');
 
