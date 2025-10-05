@@ -7,4 +7,4 @@ const content = fs.readFileSync(`./user_db/${files[0]}`, 'utf-8');
 console.log( typeof content);
 
 
-console.log(content.stringify);
+console.log(content.toString());

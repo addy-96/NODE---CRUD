@@ -27,13 +27,13 @@ export default function readUserHandler(req, res){
                 console.log(`Error in reading user file ${err}`);
                 res.statusCode = 500;
                 return res.end(JSON.stringify({message: 'Error in reading user file'}));
-      });
+        });
 
-      if( !data || data===''){
+            if( !data || data===''){
                 console.log(`File is empty ${err}`);
                 res.statusCode = 500;
                 return res.end(JSON.stringify({message: 'INTERNAL SERVER ERROR, user file empty'}));
-      }
+            }
    
             const parsedData = json.parse(data);
 
