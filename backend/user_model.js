@@ -1,8 +1,10 @@
 class User {
-  constructor(name, id) {
+  constructor(name, email, phone) {
     this.name = name;
-    this.id = id;
+    this.email = email;
+    this.phone = phone;
+    this.id = Date.now(); 
   }
 }
 
-export default  User ;
+export default User;
