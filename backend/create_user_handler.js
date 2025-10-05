@@ -12,7 +12,7 @@ export default function createUserHandler(req, res){
         const parsedData = JSON.parse(body); // convert JSON string to object
         const user = new User(parsedData.name, parsedData.email, parsedData.phone);
         
-        fs.writeFile(`./user_db/${user.id}`,JSON.stringify(user), (err)=>{
+        fs.writeFile(`./user_db/${user.id}.txt`,JSON.stringify(user), (err)=>{
           if(err){
                console.log(`Error occured while creating suer ${err}`);
                res.statusCode=404;
