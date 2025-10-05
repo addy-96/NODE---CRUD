@@ -13,10 +13,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Wrapper(),
-    );
+    return const MaterialApp(debugShowCheckedModeBanner: false, home: Wrapper());
   }
 }
 
@@ -85,8 +82,7 @@ class MainBody extends StatefulWidget {
   State<MainBody> createState() => _MainBodyState();
 }
 
-class _MainBodyState extends State<MainBody>
-    with SingleTickerProviderStateMixin {
+class _MainBodyState extends State<MainBody> with SingleTickerProviderStateMixin {
   late Animation<Offset> cardAnimation;
   late AnimationController animationController;
   final TextEditingController _emailController = TextEditingController();
@@ -95,26 +91,17 @@ class _MainBodyState extends State<MainBody>
 
   @override
   void initState() {
-    animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
+    animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 800));
 
-    final initialUpAni =
-        Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: animationController,
-            curve: Curves.easeOutBack,
-          ),
-        );
+    final initialUpAni = Tween<Offset>(
+      begin: const Offset(0, -1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: animationController, curve: Curves.easeOutBack));
 
-    final sideAni = Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero)
-        .animate(
-          CurvedAnimation(
-            parent: animationController,
-            curve: Curves.bounceInOut,
-          ),
-        );
+    final sideAni = Tween<Offset>(
+      begin: const Offset(-2, 0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: animationController, curve: Curves.bounceInOut));
 
     cardAnimation = widget.index == 0 ? initialUpAni : sideAni;
 
@@ -128,18 +115,8 @@ class _MainBodyState extends State<MainBody>
 
     if (oldWidget.index != widget.index) {
       cardAnimation = widget.index == 0
-          ? Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(
-              CurvedAnimation(
-                parent: animationController,
-                curve: Curves.easeOutBack,
-              ),
-            )
-          : Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero).animate(
-              CurvedAnimation(
-                parent: animationController,
-                curve: Curves.bounceInOut,
-              ),
-            );
+          ? Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.easeOutBack))
+          : Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero).animate(CurvedAnimation(parent: animationController, curve: Curves.bounceInOut));
 
       animationController.reset();
       animationController.forward();
@@ -152,18 +129,12 @@ class _MainBodyState extends State<MainBody>
     super.dispose();
   }
 
-  Widget _buildTextField(
-    String label,
-    bool obscure,
-    TextInputType textInputType,
-    TextEditingController textController,
-  ) {
+  Widget _buildTextField(String label, TextInputType textInputType, TextEditingController textController) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: TextField(
         controller: textController,
         maxLength: 20,
-        obscureText: obscure,
         keyboardType: textInputType,
         decoration: InputDecoration(
           labelText: label,
@@ -196,21 +167,14 @@ class _MainBodyState extends State<MainBody>
   }
 
   showSnack(String message, Color color) {
-    return ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
+    return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
   }
 
   bool _validate(ActionType action) {
     switch (action) {
       case ActionType.create:
-        if (_emailController.text.trim().isEmpty ||
-            _nameController.text.trim().isEmpty ||
-            _phoneController.text.trim().isEmpty) {
-          showSnack(
-            'Please enter all the fields to create a user!',
-            Colors.red,
-          );
+        if (_emailController.text.trim().isEmpty || _nameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty) {
+          showSnack('Please enter all the fields to create a user!', Colors.red);
           return false;
         }
         return true;
@@ -223,9 +187,7 @@ class _MainBodyState extends State<MainBody>
         return true;
 
       case ActionType.update:
-        if (_emailController.text.trim().isEmpty ||
-            _nameController.text.trim().isEmpty ||
-            _phoneController.text.trim().isEmpty) {
+        if (_emailController.text.trim().isEmpty || _nameController.text.trim().isEmpty || _phoneController.text.trim().isEmpty) {
           showSnack('Please enter atleast one field!', Colors.red);
           return false;
         }
@@ -239,13 +201,7 @@ class _MainBodyState extends State<MainBody>
     switch (action) {
       case ActionType.create:
         if (_validate(action)) {
-          final res = AppServices.createUser(
-            User(
-              email: _emailController.text.trim(),
-              phone: _phoneController.text.trim(),
-              name: _nameController.text.trim(),
-            ),
-          );
+          final res = AppServices.createUser(User(email: _emailController.text.trim(), phone: _phoneController.text.trim(), name: _nameController.text.trim()));
           if (await res) {
             _emailController.clear();
             _nameController.clear();
@@ -263,11 +219,7 @@ class _MainBodyState extends State<MainBody>
         return;
       case ActionType.update:
         if (_validate(action)) {
-          final res = await AppServices.updateUser(
-            _nameController.text.trim(),
-            _emailController.text.trim(),
-            _phoneController.text.trim(),
-          );
+          final res = await AppServices.updateUser(_nameController.text.trim(), _emailController.text.trim(), _phoneController.text.trim());
           if (res) {
             _emailController.clear();
             _nameController.clear();
@@ -299,44 +251,19 @@ class _MainBodyState extends State<MainBody>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
-              BoxShadow(
-                blurRadius: 20,
-                color: Colors.black12,
-                offset: Offset(0, 10),
-              ),
-            ],
+            boxShadow: const [BoxShadow(blurRadius: 20, color: Colors.black12, offset: Offset(0, 10))],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 sectionTitle,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent,
-                ),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
               ),
               const SizedBox(height: 20),
-              _buildTextField(
-                "Name",
-                false,
-                TextInputType.text,
-                _nameController,
-              ),
-              _buildTextField(
-                "Email",
-                false,
-                TextInputType.emailAddress,
-                _emailController,
-              ),
-              _buildTextField(
-                "Phone Number",
-                true,
-                TextInputType.number,
-                _phoneController,
-              ),
+              _buildTextField("Name", TextInputType.text, _nameController),
+              _buildTextField("Email", TextInputType.emailAddress, _emailController),
+              _buildTextField("Phone Number", TextInputType.number, _phoneController),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -347,14 +274,9 @@ class _MainBodyState extends State<MainBody>
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: Text(
-                    sectionTitle,
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
+                  child: Text(sectionTitle, style: TextStyle(fontSize: 16, color: Colors.black)),
                 ),
               ),
             ],
@@ -376,32 +298,17 @@ class _MainBodyState extends State<MainBody>
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            boxShadow: const [
-              BoxShadow(
-                blurRadius: 20,
-                color: Colors.black12,
-                offset: Offset(0, 10),
-              ),
-            ],
+            boxShadow: const [BoxShadow(blurRadius: 20, color: Colors.black12, offset: Offset(0, 10))],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 sectionTitle,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent,
-                ),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blueAccent),
               ),
               const SizedBox(height: 20),
-              _buildTextField(
-                "Name",
-                false,
-                TextInputType.text,
-                _nameController,
-              ),
+              _buildTextField("Name", TextInputType.text, _nameController),
               const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
@@ -412,14 +319,9 @@ class _MainBodyState extends State<MainBody>
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: Text(
-                    sectionTitle,
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
+                  child: Text(sectionTitle, style: TextStyle(fontSize: 16, color: Colors.black)),
                 ),
               ),
             ],
